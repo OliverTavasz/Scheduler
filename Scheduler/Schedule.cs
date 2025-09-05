@@ -7,7 +7,7 @@
         public bool AddSession(int[] hours, Session session)
         {
             Array.Sort(hours);
-            if (Sessions.Length < hours[^1] || hours[0] < 0)
+            if (!(hours[^1] < Sessions.Length && hours[0] >= 0))
                 return false;
 
             for (int i = 0; i < hours.Length; i++)
@@ -18,9 +18,9 @@
         }
         public Session? GetSession(int hour)
         {
-            if (Sessions.Length < hour || hour < 0)
-                return null;
-            return Sessions[hour];
+            if (hour < Sessions.Length && hour >= 0)
+                return Sessions[hour];
+            return null;
         }
     }
 }
