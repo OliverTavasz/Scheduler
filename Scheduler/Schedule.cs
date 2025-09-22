@@ -3,7 +3,7 @@
     public class Schedule
     {
         private const int HOURS_IN_A_DAY = 24;
-        private readonly Session[] Sessions = new Session[HOURS_IN_A_DAY];
+        public readonly Session[] Sessions = new Session[HOURS_IN_A_DAY];
         public bool AddSession(int[] hours, Session session)
         {
             Array.Sort(hours);
@@ -21,6 +21,10 @@
             if (hour < Sessions.Length && hour >= 0)
                 return Sessions[hour];
             return null;
+        }
+        public void RemoveSession(int hour)
+        {
+            Sessions[hour] = null;
         }
     }
 }
