@@ -13,18 +13,13 @@ namespace Scheduler
         public static bool RemoveSchedule(DateOnly date) => FullSchedule.Remove(date);
         public static bool AddSession(DateTime date, int[] hours, Session session)
         {
-            if (FullSchedule.TryGetValue(DateOnly.FromDateTime(date), out Schedule? s))
-            {
-                if(s is null)
-                    s = new Schedule();
-
-                return s.AddSession(hours, session);
-            }
-            return false;
+            if (!FullSchedule.TryGetValue(DateOnly.FromDateTime(date), out Schedule? s))
+                 s = new Schedule();
+            return s.AddSession(hours, session) && AddSchedule(DateOnly.FromDateTime(date), s);
         }
         public static bool RemoveSession(DateTime date)
         {
-            if(FullSchedule.TryGetValue(DateOnly.FromDateTime(date), out Schedule? s) && s is not null)
+            if(FullSchedule.TryGetValue(DateOnly.FromDateTime(date), out Schedule? s))
             {
                 s.RemoveSession(date.Hour);
                 return true;

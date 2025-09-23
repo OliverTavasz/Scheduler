@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Scheduler;
+using System;
 
 
 
@@ -64,27 +65,83 @@ app.MapGet("/Schedule/GetSeven", () =>
     Schedule?[] schedules = new Schedule[7];
     for(int i = 0; i < schedules.Length; i++)
     {
-        date.AddDays(1);
+        date = date.AddDays(1);
         schedules[i] = ScheduleManager.GetSchedule(date);
     }
     return JsonConvert.SerializeObject(schedules);
 });
 
-app.MapPost("/Session/Add/", (string date, int[] hours, int type, string[]? hosts = null, string[]? guests = null) => {
+app.MapPost("/Session/Add", (string date, string hours, int type, string? hosts, string? guests) => {
     Session s = new((SessionType)type);
-    if (hosts is not null)
-        s.AddHosts(hosts);
-    if (guests is not null)
-        s.AddGuests(guests);
-
-    if (DateTime.TryParse(date, out DateTime result) || s is null)
+    if (s is null || !DateTime.TryParse(date, out DateTime result))
         return false;
-    return ScheduleManager.AddSession(result, hours, s);
+
+    string[]? h = hosts?.Split(',');
+    string[]? g = guests?.Split(',');
+
+    if (h is not null)
+        s.AddHosts(h);
+    if (g is not null)
+        s.AddGuests(g);
+
+    string[] hoursArray = hours.Split(',');
+    int[] hNum = new int[hoursArray.Length];
+
+    for (int i = 0; i < hoursArray.Length; i++)
+    {
+        if (!int.TryParse(hoursArray[i], out int result2))
+            return false;
+        hNum[i] = result2;
+    }
+
+    return ScheduleManager.AddSession(result, hNum, s);
 });
-app.MapPost("/Session/Delete/", (string date) => {
+app.MapPost("/Session/Remove", (string date) => {
     if (DateTime.TryParse(date, out DateTime result))
         return ScheduleManager.RemoveSession(result);
     return false;
+});
+app.MapPost("/Session/Reschedule", (string sourceDate, string destinationDate) => {
+    if (!(DateTime.TryParse(sourceDate, out DateTime sDate) && DateTime.TryParse(destinationDate, out DateTime dDate)))
+        return false;
+    Session s = ScheduleManager.GetSession(sDate);
+    if (s is null)
+        return false;
+
+    ScheduleManager.RemoveSession(sDate);
+    ScheduleManager.AddSession(dDate, [dDate.Hour], s);
+    return true;
+});
+
+app.MapPost("/Session/AddPeople", (string date, string? hosts, string? guests) => {
+    if (!DateTime.TryParse(date, out DateTime d))
+        return false;
+    Session s = ScheduleManager.GetSession(d);
+    if(s is null) return false;
+
+    string[]? h = hosts?.Split(',');
+    string[]? g = guests?.Split(',');
+
+    if (h is not null)
+        s.AddHosts(h);
+    if (g is not null)
+        s.AddGuests(g);
+    return true;
+});
+app.MapPost("/Session/RemovePeople", (string date, string? hosts, string? guests) => {
+    if (!DateTime.TryParse(date, out DateTime d))
+        return false;
+    Session s = ScheduleManager.GetSession(d);
+    if (s is null) return false;
+
+    string[]? h = hosts?.Split(',');
+    string[]? g = guests?.Split(',');
+
+    if (h is not null)
+        s.RemoveHosts(h);
+    if (g is not null)
+        s.RemoveGuests(g);
+    return true;
 });
 
 app.Run();
