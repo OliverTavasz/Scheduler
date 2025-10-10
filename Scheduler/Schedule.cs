@@ -3,16 +3,34 @@
     public class Schedule
     {
         private const int HOURS_IN_A_DAY = 24;
+        public DateOnly Date = DateOnly.MinValue;
         public readonly Session[] Sessions = new Session[HOURS_IN_A_DAY];
-        public bool AddSession(int[] hours, Session session)
-        {
-            Array.Sort(hours);
-            if (!(hours[^1] < Sessions.Length && hours[0] >= 0))
-                return false;
 
-            for (int i = 0; i < hours.Length; i++)
+        public Schedule(DateOnly date)
+        {
+            Date = date;
+        }
+
+        public bool AddSessions(Session[] sessions)
+        {
+            //Array.Sort(hours);
+            //if (!(hours[^1] < Sessions.Length && hours[0] >= 0))
+            //    return false;
+
+            //for (int i = 0; i < hours.Length; i++)
+            //{
+            //    Sessions[hours[i]] = session;
+            //}
+            //return true;
+
+            for (int i = 0; i < sessions.Length; i++)
             {
-                Sessions[hours[i]] = session;
+                if (!(sessions[i].Hour < Sessions.Length && sessions[i].Hour >= 0))
+                    return false;
+            }
+            for (int i = 0; i < sessions.Length; i++)
+            {
+                Sessions[sessions[i].Hour] = sessions[i];
             }
             return true;
         }
@@ -22,9 +40,11 @@
                 return Sessions[hour];
             return null;
         }
-        public void RemoveSession(int hour)
+        public void RemoveSession(int hour, Context con)
         {
+            con.RemoveSession(Sessions[hour]);
             Sessions[hour] = null;
+            con.SaveChanges();
         }
     }
 }

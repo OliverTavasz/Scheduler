@@ -1,40 +1,88 @@
 ﻿namespace Scheduler
 {
-    public class Session(SessionType type)
+    public class Session
     {
-        public readonly SessionType Type = type;
-        public readonly List<string> Guests = [];
-        public readonly List<string> Hosts = [];
+        public int Id { get; set; }
+        public int Type { get; set; }
+        public string Guests { get; set; } = "";
+        public string Hosts { get; set; } = "";
+        public string date { get; set; } = "";
+        public int Hour { get; set; } = 0;
+
+        public Session(int type, int hour, Schedule parent)
+        {
+            Type = type;
+            Hour = hour;
+            date = parent.Date.ToString();
+        }
+        public Session()
+        {
+
+        }
+
         public void AddGuests(string[] guests)
         {
-            Guests.AddRange(guests);
+            List<string> g = [.. Guests.Split(',')];
+            g.AddRange(guests);
+
+            string r = "";
+            for (int i = 0; i < g.Count; i++)
+            {
+                r += g[i] + ",";
+            }
+            r.Remove(r.Length - 1);
+
+            Guests = r;
         }
         public void RemoveGuests(string[] guests)
         {
-            for (int i = 0; i < Guests.Count; i++)
+            List<string> g = [.. Guests.Split(',')];
+            for (int i = 0; i <= guests.Length; i++)
             {
-                if (guests.Contains(Guests[i]))
-                {
-                    Guests.RemoveAt(i);
-                    i--;
-                }
+                if (g.Contains(guests[i]))
+                    g.Remove(guests[i]);
             }
+
+            string r = "";
+            for (int i = 0; i < g.Count; i++)
+            {
+                r += g[i] + ",";
+            }
+            r.Remove(r.Length - 1);
+
+            Guests = r;
         }
         public void AddHosts(string[] hosts)
         {
-            Hosts.AddRange(hosts);
+            List<string> h = [.. Hosts.Split(',')];
+            h.AddRange(hosts);
+
+            string r = "";
+            for (int i = 0; i < h.Count; i++)
+            {
+                r += h[i] + ",";
+            }
+            r.Remove(r.Length - 1);
+
+            Hosts = r;
         }
         public void RemoveHosts(string[] hosts)
         {
-            for (int i = 0; i < Hosts.Count; i++)
+            List<string> h = [.. Hosts.Split(',')];
+            for (int i = 0; i <= hosts.Length; i++)
             {
-                if (hosts.Contains(Hosts[i]))
-                {
-                    Hosts.RemoveAt(i);
-                    i--;
-                }
+                if (h.Contains(hosts[i]))
+                    h.Remove(hosts[i]);
             }
+
+            string r = "";
+            for (int i = 0; i < h.Count; i++)
+            {
+                r += h[i] + ",";
+            }
+            r.Remove(r.Length - 1);
+
+            Hosts = r;
         }
-        public static Session Music => new(SessionType.Music);
     }
 }
