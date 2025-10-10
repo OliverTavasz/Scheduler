@@ -37,7 +37,7 @@
         public void RemoveGuests(string[] guests)
         {
             List<string> g = [.. Guests.Split(',')];
-            for (int i = 0; i <= guests.Length; i++)
+            for (int i = 0; i < guests.Length; i++)
             {
                 if (g.Contains(guests[i]))
                     g.Remove(guests[i]);
@@ -69,7 +69,7 @@
         public void RemoveHosts(string[] hosts)
         {
             List<string> h = [.. Hosts.Split(',')];
-            for (int i = 0; i <= hosts.Length; i++)
+            for (int i = 0; i < hosts.Length; i++)
             {
                 if (h.Contains(hosts[i]))
                     h.Remove(hosts[i]);

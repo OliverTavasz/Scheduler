@@ -44,7 +44,6 @@
         {
             con.RemoveSession(Sessions[hour]);
             Sessions[hour] = null;
-            con.SaveChanges();
         }
     }
 }
