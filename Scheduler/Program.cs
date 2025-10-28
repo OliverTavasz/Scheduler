@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Scheduler;
 using System;
+using System.Data.Common;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,8 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin();
     });
 });
-builder.Services.AddDbContext<Context>(options => options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Sessions;Trusted_Connection=True;TrustServerCertificate=True;"));
+//builder.Services.AddDbContext<Context>(options => options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Sessions;Trusted_Connection=True;TrustServerCertificate=True;"));
+builder.Services.AddDbContext<Context>(options => options.UseMySql("Server=localhost;Database=scheduler;User=root;Password=root;", new MySqlServerVersion(new Version(9, 4, 0))));
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -11,8 +11,8 @@ using Scheduler;
 namespace Scheduler.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251010073759_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251023172651_mysql")]
+    partial class mysql
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,9 +20,9 @@ namespace Scheduler.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Scheduler.Session", b =>
                 {
@@ -30,7 +30,25 @@ namespace Scheduler.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Guests")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hosts")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Hour")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("date")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
