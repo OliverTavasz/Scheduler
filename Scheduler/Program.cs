@@ -7,14 +7,17 @@ using Newtonsoft.Json;
 using Scheduler;
 using System;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.AllowAnyOrigin();
+        policy.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
     });
 });
 //builder.Services.AddDbContext<Context>(options => options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=Sessions;Trusted_Connection=True;TrustServerCertificate=True;"));
@@ -29,7 +32,7 @@ app.UseDeveloperExceptionPage();
 app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseCors("AllowAll");
+app.UseCors("AllowReactApp");
 app.MapControllers();
 
 app.MapGet("/Session/Get/{date}", (string date, Context con) =>
@@ -73,39 +76,52 @@ app.MapGet("/Schedule/GetSeven", (Context con) =>
 
 app.MapPost("/Session/Add", (string date, string hours, int type, string? hosts, string? guests, Context con) =>
 {
-    con.ConstructSchedules();
-    if (!DateTime.TryParse(date, out DateTime result))
+    if (!DateTime.TryParse(date, out DateTime datetime))
+        return false;
+    if (!DateOnly.TryParse(date, out DateOnly result))
         return false;
 
     string[]? h = hosts?.Split(',');
     string[]? g = guests?.Split(',');
 
     string[] hoursArray = hours.Split(',');
-    int[] hNum = new int[hoursArray.Length];
 
     for (int i = 0; i < hoursArray.Length; i++)
     {
         if (!int.TryParse(hoursArray[i], out int result2))
             return false;
-        hNum[i] = result2;
-    }
 
-    bool success = ScheduleManager.AddSession(DateOnly.FromDateTime(result), hNum, type, h, g, con);
-    if (success)
-        con.SaveChanges();
-    return success;
-});
-app.MapPost("/Session/Remove", (string date, Context con) =>
-{
-    con.ConstructSchedules();
-    if (DateTime.TryParse(date, out DateTime result))
-        return ScheduleManager.RemoveSession(result, con);
+        Session s = new(type, result2, result);
+        s.AddHosts(h);
+        s.AddGuests(g);
+
+        Session? os = con.Sessions.FirstOrDefault(s => s.date == result.ToString() && s.Hour == result2);
+        if (os is not null) {
+            os.SetValues(s);
+        } else {
+            con.Add(s);
+        }
+           
+    }
     con.SaveChanges();
-    return false;
+    return true;
+});
+app.MapPost("/Session/Remove", async (string date, Context con) =>
+{
+    if (!DateTime.TryParse(date, out DateTime fulldate))
+        return false;
+
+    var e = await con.Sessions.FirstOrDefaultAsync(s => s.date == DateOnly.FromDateTime(fulldate).ToString() && s.Hour == fulldate.Hour);
+    if (e is not null) { 
+        con.Sessions.Remove(e); 
+    } else { 
+        return false; 
+    }
+    await con.SaveChangesAsync();
+    return true;
 });
 app.MapPost("/Session/Reschedule", (string sourceDate, string destinationDate, Context con) =>
 {
-    //con.ConstructSchedules();
     if (!(DateTime.TryParse(sourceDate, out DateTime sDate) && DateTime.TryParse(destinationDate, out DateTime dDate)))
         return false;
 

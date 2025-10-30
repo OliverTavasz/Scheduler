@@ -15,13 +15,31 @@
             Hour = hour;
             date = parent.Date.ToString();
         }
+        public Session(int type, int hour, DateOnly datetime)
+        {
+            Type = type;
+            Hour = hour;
+            date = datetime.ToString();
+        }
         public Session()
         {
 
         }
 
-        public void AddGuests(string[] guests)
+        public void SetValues(Session s)
         {
+            Type = s.Type;
+            Hour = s.Hour;
+            Hosts = s.Hosts;
+            Guests = s.Guests;
+            date = s.date;
+        }
+
+        public void AddGuests(string[]? guests)
+        {
+            if (guests is null)
+                return;
+
             List<string> g = [.. Guests.Split(',')];
             g.AddRange(guests);
 
@@ -52,8 +70,11 @@
 
             Guests = r;
         }
-        public void AddHosts(string[] hosts)
+        public void AddHosts(string[]? hosts)
         {
+            if (hosts is null)
+                return;
+
             List<string> h = [.. Hosts.Split(',')];
             h.AddRange(hosts);
 
