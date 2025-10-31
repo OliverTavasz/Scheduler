@@ -1,4 +1,6 @@
-﻿namespace Scheduler
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace Scheduler
 {
     public class Session
     {

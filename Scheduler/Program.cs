@@ -32,8 +32,10 @@ app.UseDeveloperExceptionPage();
 app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseRouting();
 app.UseCors("AllowReactApp");
 app.MapControllers();
+
 
 app.MapGet("/Session/Get/{date}", (string date, Context con) =>
 {
@@ -76,6 +78,7 @@ app.MapGet("/Schedule/GetSeven", (Context con) =>
 
 app.MapPost("/Session/Add", (string date, string hours, int type, string? hosts, string? guests, Context con) =>
 {
+
     if (!DateTime.TryParse(date, out DateTime datetime))
         return false;
     if (!DateOnly.TryParse(date, out DateOnly result))
