@@ -3,6 +3,7 @@ import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Stack from "react-bootstrap/Stack";
 
 function App() {
     const [date, setDate] = useState('2025-10-30');
@@ -16,6 +17,19 @@ function App() {
         hosts: '',
         guests: ''
     });
+
+    const typeMap = (type) => {
+        switch (type) {
+            case 0:
+                return "Music";
+            case 1:
+                return "Prerecorded";
+            case 2:
+                return "Live";
+            default:
+                return "Unkown";
+        }
+    }
 
     const handleDeleteSession = async (event) => {
         event.preventDefault();
@@ -44,6 +58,8 @@ function App() {
     const reloadSessions = () => {
         setFetchString('http://localhost:5000/Schedule/Get/' + date);
 
+        setData([]);
+
         fetch(fetchString)
             .then(response => response.json())
             .then(data => {
@@ -55,6 +71,7 @@ function App() {
                 }
             })
             .catch(error => console.error('Error fetching data:', error));
+        console.log(data);
     }
 
 
@@ -100,6 +117,8 @@ function App() {
         } catch (error) {
             console.error('Unexpected error:', error);
         }
+
+        reloadSessions();
     };
 
 
@@ -116,17 +135,37 @@ function App() {
                                 onChange={handleDateChange}
                             />
                         </label>
-                        <Button type="Submit">Submit</Button>
+                        <Button type="Submit">Get</Button>
                     </form>
                 </Col>
                 <Col>
                     <form onSubmit={handleNewSession}>
-                        <label>Date<input type="text" name="date" value={newSession.Date} onChange={handleNewSessionChange} required /></label>
-                        <label>Hours<input type="text" name="hours" value={newSession.Hours} onChange={handleNewSessionChange} required /></label>
-                        <label>Type<input type="number" name="type" value={newSession.Type} onChange={handleNewSessionChange} required /></label>
-                        <label>Hosts<input type="text" name="hosts" value={newSession.Hosts} onChange={handleNewSessionChange} /></label>
-                        <label>Guests<input type="text" name="guests" value={newSession.Guests} onChange={handleNewSessionChange} /></label>
-                        <Button type="Submit">Add Session</Button>
+                        <Stack>
+                            <div>
+                                <label>Date<input type="text" name="date" value={newSession.Date} onChange={handleNewSessionChange} required /></label>
+                            </div>
+
+                            <div>
+                                <label>Hours<input type="text" name="hours" value={newSession.Hours} onChange={handleNewSessionChange} required /></label>
+                            </div>
+
+                            <div>
+                                <label>Type<input type="number" name="type" value={newSession.Type} onChange={handleNewSessionChange} required /></label>
+                            </div>
+
+                            <div>
+                                <label>Hosts<input type="text" name="hosts" value={newSession.Hosts} onChange={handleNewSessionChange} /></label>
+                            </div>
+
+                            <div>
+                                <label>Guests<input type="text" name="guests" value={newSession.Guests} onChange={handleNewSessionChange} /></label>
+                            </div>
+
+                            <div>
+                                <Button type="Submit">Add Session</Button>
+                            </div>
+                        </Stack>
+                        
                     </form>
                 </Col>
             </Row>
@@ -147,11 +186,10 @@ function App() {
                 <tbody>
                     {data.map((item, index) =>
                     (
-                        item ?
-                            (
+                        item ? (
                                 <tr key={index}>
                                     <td>{item.Hour}:00</td>
-                                    <td>{item.Type}</td>
+                                    <td>{typeMap(item.Type)}</td>
                                     <td>{item.Hosts}</td>
                                     <td>{item.Guests}</td>
                                     <td>
@@ -171,7 +209,7 @@ function App() {
                                     <td></td>
                                 </tr>
                             )
-                    )
+                        )
                     )}
                 </tbody>
             </table>
