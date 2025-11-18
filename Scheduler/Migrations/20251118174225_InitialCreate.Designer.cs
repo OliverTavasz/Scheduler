@@ -11,8 +11,8 @@ using Scheduler;
 namespace Scheduler.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251023172651_mysql")]
-    partial class mysql
+    [Migration("20251118174225_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace Scheduler.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Guests")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -43,12 +47,12 @@ namespace Scheduler.Migrations
                     b.Property<int>("Hour")
                         .HasColumnType("int");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<string>("date")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

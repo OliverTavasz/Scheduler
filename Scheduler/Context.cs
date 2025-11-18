@@ -5,50 +5,32 @@ namespace Scheduler
     public class Context(DbContextOptions<Context> options) : DbContext(options)
     {
         public DbSet<Session> Sessions { get; set; }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<Schedule>()
-        //        .HasMany(s => s.Sessions);
-        //}
-        public void ConstructSchedules()
+        public Session GetSession()
         {
-            ScheduleManager.FullSchedule = [];
+            return GetSession(DateTime.Now) ?? Session.Default();
+        }
+        public Session? GetSession(DateTime date)
+        {
+            var matching = Sessions.FirstOrDefault(item => item.Date == date.ToShortDateString() && item.Hour == date.Hour);
+            if (matching is not null)
+                return matching;
+            return null;
+        }
+        public Session[] GetSchedule()
+        {
+            return GetSchedule(DateOnly.FromDateTime(DateTime.Now));
+        }
+        public Session[] GetSchedule(DateOnly date)
+        {
+            var matching = Sessions.Where(item => item.Date == date.ToString());
+            if (matching is not null)
+                return [.. matching];
 
-            //for(int i = 0; i < Sessions.Count(); i++)
-            //{
-
-            //}
-
-            foreach(Session s in Sessions)
-            {
-                if (!DateOnly.TryParse(s.date, out DateOnly d))
-                {
-                    Sessions.Remove(s);
-                    continue;
-                }
-
-                if (!ScheduleManager.FullSchedule.TryGetValue(d, out Schedule? sd))
-                {
-                    sd = new Schedule(d);
-                    ScheduleManager.FullSchedule.Add(d, sd);
-                }
-
-                if (!sd.AddSessions([s]))
-                {
-                    Sessions.Remove(s);
-                    continue;
-                }
-            }
+            return [.. Enumerable.Repeat(Session.Default(), 24)];
         }
         public bool AddSessions(Session[] session)
         {
-            for (int i = 0; i < session.Length; i++)
-            {
-                if (Sessions.Contains(session[i]))
-                    continue;
-                Sessions.Add(session[i]);
-            }
+            Sessions.AddRange(session);
             return true;
         }
         public bool RemoveSession(Session session)

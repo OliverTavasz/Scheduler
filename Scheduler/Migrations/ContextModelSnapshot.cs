@@ -29,6 +29,10 @@ namespace Scheduler.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Guests")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -40,12 +44,12 @@ namespace Scheduler.Migrations
                     b.Property<int>("Hour")
                         .HasColumnType("int");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<string>("date")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

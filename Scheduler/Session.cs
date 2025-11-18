@@ -5,107 +5,82 @@ namespace Scheduler
     public class Session
     {
         public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Type { get; set; }
-        public string Guests { get; set; } = "";
-        public string Hosts { get; set; } = "";
-        public string date { get; set; } = "";
-        public int Hour { get; set; } = 0;
+        public string Date { get; set; } = string.Empty;
+        public int Hour { get; set; }
+        public string Guests { get; set; } = string.Empty;
+        public string Hosts { get; set; } = string.Empty;
 
-        public Session(int type, int hour, Schedule parent)
+        public Session(string name, int type, DateOnly date, int hour)
         {
+            Name = name;
             Type = type;
-            Hour = hour;
-            date = parent.Date.ToString();
+            Date = date.ToString();
+            Hour = Math.Clamp(hour, 0, 23);
         }
-        public Session(int type, int hour, DateOnly datetime)
+        public Session(string name, int type, string date, int hour)
         {
+            Name = name;
             Type = type;
             Hour = hour;
-            date = datetime.ToString();
+            Date = date;
         }
         public Session()
         {
 
         }
-
-        public void SetValues(Session s)
+        public void Set(Session other)
         {
-            Type = s.Type;
-            Hour = s.Hour;
-            Hosts = s.Hosts;
-            Guests = s.Guests;
-            date = s.date;
+            Name = other.Name;
+            Type = other.Type;
+            Date = other.Date;
+            Hour = other.Hour;
+            Guests = other.Guests;
+            Hosts = other.Hosts;
+        }
+        public static Session Default()
+        {
+            return new Session("Music", -1, DateOnly.MinValue, -1);
+        }
+        public static Session Default(string date, int hour)
+        {
+            return new Session("Music", -1, date, hour);
         }
 
         public void AddGuests(string[]? guests)
         {
+            if (guests is not null)
+                Guests = (Guests == "" ? "" : (Guests + ",")) + string.Join(",", guests);
+        }
+        public void RemoveGuests(string[]? guests)
+        {
             if (guests is null)
                 return;
-
-            List<string> g = [.. Guests.Split(',')];
-            g.AddRange(guests);
-
-            string r = "";
-            for (int i = 0; i < g.Count; i++)
-            {
-                r += g[i] + ",";
-            }
-            r.Remove(r.Length - 1);
-
-            Guests = r;
-        }
-        public void RemoveGuests(string[] guests)
-        {
-            List<string> g = [.. Guests.Split(',')];
+            List<string> L = [.. Guests.Split(",")];
             for (int i = 0; i < guests.Length; i++)
             {
-                if (g.Contains(guests[i]))
-                    g.Remove(guests[i]);
+                if (L.Contains(guests[i]))
+                    L.Remove(guests[i]);
             }
-
-            string r = "";
-            for (int i = 0; i < g.Count; i++)
-            {
-                r += g[i] + ",";
-            }
-            r.Remove(r.Length - 1);
-
-            Guests = r;
+            Guests = string.Join(",", L);
         }
         public void AddHosts(string[]? hosts)
         {
+            if (hosts is not null)
+                Hosts = (Hosts == "" ? "" : (Hosts + ",")) + string.Join(",", hosts);
+        }
+        public void RemoveHosts(string[]? hosts)
+        {
             if (hosts is null)
                 return;
-
-            List<string> h = [.. Hosts.Split(',')];
-            h.AddRange(hosts);
-
-            string r = "";
-            for (int i = 0; i < h.Count; i++)
-            {
-                r += h[i] + ",";
-            }
-            r.Remove(r.Length - 1);
-
-            Hosts = r;
-        }
-        public void RemoveHosts(string[] hosts)
-        {
-            List<string> h = [.. Hosts.Split(',')];
+            List<string> L = [.. Hosts.Split(",")];
             for (int i = 0; i < hosts.Length; i++)
             {
-                if (h.Contains(hosts[i]))
-                    h.Remove(hosts[i]);
+                if (L.Contains(hosts[i]))
+                    L.Remove(hosts[i]);
             }
-
-            string r = "";
-            for (int i = 0; i < h.Count; i++)
-            {
-                r += h[i] + ",";
-            }
-            r.Remove(r.Length - 1);
-
-            Hosts = r;
+            Hosts = string.Join(",", L);
         }
     }
 }
