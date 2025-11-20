@@ -5,12 +5,12 @@ namespace Scheduler
     public class Session
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = "";
         public int Type { get; set; }
-        public string Date { get; set; } = string.Empty;
+        public string Date { get; set; } = "";
         public int Hour { get; set; }
-        public string Guests { get; set; } = string.Empty;
-        public string Hosts { get; set; } = string.Empty;
+        public string Guests { get; set; } = "";
+        public string Hosts { get; set; } = "";
 
         public Session(string name, int type, DateOnly date, int hour)
         {
@@ -39,13 +39,9 @@ namespace Scheduler
             Guests = other.Guests;
             Hosts = other.Hosts;
         }
-        public static Session Default()
-        {
-            return new Session("Music", -1, DateOnly.MinValue, -1);
-        }
         public static Session Default(string date, int hour)
         {
-            return new Session("Music", -1, date, hour);
+            return new Session("Music", 0, date, hour);
         }
 
         public void AddGuests(string[]? guests)

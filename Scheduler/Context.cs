@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Tls;
 
 namespace Scheduler
 {
@@ -7,7 +8,7 @@ namespace Scheduler
         public DbSet<Session> Sessions { get; set; }
         public Session GetSession()
         {
-            return GetSession(DateTime.Now) ?? Session.Default();
+            return GetSession(DateTime.Now) ?? Session.Default(DateOnly.FromDateTime(DateTime.Now).ToString(), DateTime.Now.Hour);
         }
         public Session? GetSession(DateTime date)
         {
@@ -22,11 +23,24 @@ namespace Scheduler
         }
         public Session[] GetSchedule(DateOnly date)
         {
-            var matching = Sessions.Where(item => item.Date == date.ToString());
-            if (matching is not null)
-                return [.. matching];
 
-            return [.. Enumerable.Repeat(Session.Default(), 24)];
+            Session[] s = new Session[24];
+
+            for(int i = 0; i < s.Length; i++)
+            {
+                s[i] = Session.Default(date.ToString(), i);
+            }
+
+            Session[] matching = [.. Sessions.Where(item => item.Date == date.ToString())];
+            if (matching is not null && matching.Length != 0)
+            {
+                for(int i = 0; i < matching.Length; i++)
+                {
+                    s[matching[i].Hour] = matching[i];
+                }
+            }    
+
+            return s;
         }
         public bool AddSessions(Session[] session)
         {

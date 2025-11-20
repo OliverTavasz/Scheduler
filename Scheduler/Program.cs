@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Scheduler;
-using System;
-using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +38,7 @@ app.MapGet("/Session/Get/{date}", (string date, Context con) =>
     {
         return JsonConvert.SerializeObject(con.GetSession(dateTime));
     }
-    return JsonConvert.SerializeObject(Session.Default());
+    return "Error parsing date";
 });
 app.MapGet("/Session/Get", (Context con) =>
 {
@@ -57,7 +51,7 @@ app.MapGet("/Schedule/Get/{date}", (string date, Context con) =>
     {
         return JsonConvert.SerializeObject(con.GetSchedule(dateOnly));
     }
-    return JsonConvert.SerializeObject(Session.Default());
+    return "Error parsing date";
 });
 app.MapGet("/Schedule/Get", (Context con) =>
 {

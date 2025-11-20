@@ -15,27 +15,50 @@
   color: #888;
 }
 
-.bar {
-    height: 2em;
-    background-color: blue;
+
+.barContainer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: black;
+    padding: 10px;
+    z-index: 1000;
 }
 
-.barcontainer {
+.progressBar {
+    margin: 0 auto;
     width: 10em;
     height: 2em;
     background-color: darkblue;
 }
 
-.SessionTable{
-    margin: 0 auto;
-    
+.bar {
+    height: 2em;
+    background-color: blue;
 }
 
-.SessionTable table{
-    display: grid;
+.mainPage{
+    width: 100%;
 }
 
-.SessionList {
+.sessionList tbody, thead {
     height: 200px;
-    overflow: scroll;
+    display: grid;
+    grid-template-columns: 30% 30% 30%;
+    scrollbar-gutter: stable;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.sessionList thead {
+    height: auto;
+    overflow: hidden;
+}
+
+.sessionList tbody tr{
+    display: contents;
+}
+.sessionList thead tr {
+    display: contents;
 }
