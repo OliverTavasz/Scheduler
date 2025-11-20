@@ -1,8 +1,15 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Scheduler;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +17,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy
+        .AllowAnyOrigin()
         .AllowAnyMethod()
         .AllowAnyHeader();
     });
@@ -22,6 +30,24 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
+var key = Encoding.ASCII.GetBytes("nbufdubhzphbhdzfpgijpdzrguirpghzuzhgoiurhgzohugbhdzghuizp");
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false; //only false for now
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
+
 var app = builder.Build();
 app.UseDeveloperExceptionPage();
 app.MapOpenApi();
@@ -30,6 +56,9 @@ app.UseSwaggerUI();
 app.UseRouting();
 app.UseCors("AllowReactApp");
 app.MapControllers();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.MapGet("/Session/Get/{date}", (string date, Context con) =>
@@ -171,6 +200,26 @@ app.MapPost("/Session/RemovePeople", (string date, string? hosts, string? guests
         return true;
     }
     return false;
+});
+
+
+app.MapPost("/login", (UserLoginModel login) =>
+{
+    if (login.Username == "admin" && login.Password == "admin")
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity([new Claim(ClaimTypes.Name, login.Username)]),
+            Expires = DateTime.UtcNow.AddHours(1),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return Results.Ok(new { Token = tokenHandler.WriteToken(token) });
+    }
+
+    return Results.Unauthorized();
 });
 
 app.Run();

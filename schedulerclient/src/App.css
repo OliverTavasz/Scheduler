@@ -42,7 +42,12 @@
     width: 100%;
 }
 
+.sessionList {
+    margin: 0 auto;
+}
+
 .sessionList tbody, thead {
+   
     height: 200px;
     display: grid;
     grid-template-columns: 30% 30% 30%;
@@ -51,14 +56,29 @@
     overflow-x: hidden;
 }
 
+.sessionListL tbody {
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    height: 400px;
+}
+
+.sessionListL thead {
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    height: 400px;
+}
+
+
 .sessionList thead {
     height: auto;
     overflow: hidden;
 }
 
-.sessionList tbody tr{
+.sessionList tbody tr {
     display: contents;
 }
 .sessionList thead tr {
     display: contents;
+}
+
+.gridItem {
+    border: solid black;
 }

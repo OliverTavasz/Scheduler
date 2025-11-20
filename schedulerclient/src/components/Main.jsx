@@ -106,9 +106,9 @@ function Main() {
                 <table className="sessionList">
                     <thead>
                         <tr>
-                            <th>Time</th>
-                            <th>Name</th>
-                            <th>Type</th>
+                            <th className="gridItem">Time</th>
+                            <th className="gridItem">Name</th>
+                            <th className="gridItem">Type</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -116,9 +116,9 @@ function Main() {
                         (
                             item ? (
                                 <tr key={index}>
-                                    <td>{item.Hour}</td>
-                                    <td>{item.Name}</td>
-                                    <td>{TypeMap(item.Type)}</td>
+                                    <td className="gridItem">{item.Hour}</td>
+                                    <td className="gridItem">{item.Name}</td>
+                                    <td className="gridItem">{TypeMap(item.Type)}</td>
                                 </tr>
                             ) : (
                                 <tr key={index}>
