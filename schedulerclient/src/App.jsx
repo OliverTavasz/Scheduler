@@ -36,11 +36,15 @@ function App() {
 
     return (
         <div>
-            <form className="loginForm" onSubmit={SubmitLogin}>
-                <label>username<input type="text" name="username" onChange={UpdateLogin} /></label>
-                <label>password<input type="password" name="password" onChange={UpdateLogin} /></label>
-                <button type="submit">Login</button>
-            </form>
+            {localStorage.getItem("token") == null ? (
+                <form className="loginForm" onSubmit={SubmitLogin}>
+                    <label>username<input type="text" name="username" onChange={UpdateLogin} /></label>
+                    <label>password<input type="password" name="password" onChange={UpdateLogin} /></label>
+                    <button type="submit">Login</button>
+                </form>)
+                : (
+                <p>You are logged in</p>)}
+            
             <Router>
                 <Routes>
                     <Route path="/" element={<Main />} />
